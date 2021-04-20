@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div">
+<div class="row" style="margin: 0 10%">
+     <div class="col-sm-4" style="display: inline-flex">
+         {% for product in lst %}
+         {% if loop.index0 % 10 == 0 %}
+            </div>
+            </div>
+            <div class="row" style="margin: 0 10%">
+            <div class="col-sm-4" style="display: inline-flex;">
+         {% endif %}
+         <div class="product" style="margin-right: 20%;">
+             <div class="product-img">
+                 <a href="product.id"><img style="width: 140%;" src="{{ product.image }}" alt=""></a>
+             </div>
+         <p class="product-title">
+             <a href="{{ product.id }}">{{ product.name }}</a>
+         </p>
+         <p class="product-price">Price: {{ product.cost}}</p>
+         </div>
+         {% endfor %}
+     </div>
+</div>
+</div>
+
+{% endblock %}

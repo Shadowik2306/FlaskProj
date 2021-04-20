@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div>
+    <div>
+        <img src="{{ product.image }}" style="width: 30%; height: 40%">
+    </div>
+    <h2>{{ product.name }}</h2>
+    <h4>{{ product.cost }}</h4>
+    <button type="submit" class="btn btn-primary">Купить</button>
+</div>
+
+{% endblock %}
