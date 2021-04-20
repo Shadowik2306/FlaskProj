@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="display: block; margin: 0 10%">
+    <form method="post">
+        <h1>Отзывы</h1>
+        <p>
+        {% for i in comments %}
+            <p>
+                <h2>{{ i.user.name }} {{ i.user.surname }}</h2>
+                <br>
+                {{ i.text }}
+            </p>
+        {% endfor %}
+        {% if current_user.is_authenticated %}
+        <button type="submit" class="btn btn-primary right">Написать коммент</button>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

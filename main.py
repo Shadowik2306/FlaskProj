@@ -1,9 +1,10 @@
-from flask import Flask, url_for, render_template, make_response, abort, redirect
+from flask import Flask, url_for, render_template, make_response, abort, redirect, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data import db_session
 
 from data.products import Products
 from data.user import User
+from data.comments import Comments
 
 from forms.loginForm import LoginForm
 from forms.registrationForm import Register
@@ -44,6 +45,11 @@ def start_page():
 
 @app.route('/<int:idProd>', methods=['GET', 'POST'])
 def product_page(idProd):
+    if request.method == 'POST':
+        if current_user.is_authenticated:
+            return 'Покупка совершена'
+        else:
+            return redirect('/login')
     db_sess = db_session.create_session()
     products = db_sess.query(Products).get(idProd)
     params = {
@@ -91,6 +97,27 @@ def register():
         db_sess.commit()
         return redirect('/')
     return render_template('register.html', form=form)
+
+
+@app.route('/about_us')
+def about_us():
+    params = {
+        'title': "ВерстNET",
+        'now_tab': 2,
+    }
+    return render_template('about_us.html', **params)
+
+
+@app.route('/comments')
+def comments():
+    db_sess = db_session.create_session()
+    comm = db_sess.query(Comments).all()
+    params = {
+        'title': "ВерстNET",
+        'now_tab': 3,
+        'comments': comm
+    }
+    return render_template('comments.html', **params)
 
 
 if __name__ == '__main__':

@@ -31,8 +31,8 @@
 
         <ul class="nav nav-pills">
           <li class="nav-item"><a href="/" class="nav-link {% if now_tab == 1 %} active {% endif %}">Товары</a></li>
-          <li class="nav-item"><a href="#" class="nav-link {% if now_tab == 2 %} active {% endif %}">О нас</a></li>
-          <li class="nav-item"><a href="#" class="nav-link {% if now_tab == 3 %} active {% endif %}">Отзывы</a></li>
+          <li class="nav-item"><a href="/about_us" class="nav-link {% if now_tab == 2 %} active {% endif %}">О нас</a></li>
+          <li class="nav-item"><a href="/comments" class="nav-link {% if now_tab == 3 %} active {% endif %}">Отзывы</a></li>
             {% if current_user.is_authenticated %}
                 <a class="navbar-brand" href="/logout">{{ current_user.name }}</a>
             {% else %}
@@ -44,7 +44,7 @@
       <main>
           {% block content %} {% endblock %}
       </main>
-        <footer class="bg-light text-center text-lg-start" style="position: fixed; left: 0; bottom: 0; width: 100%; ">
+        <footer class="bg-light text-center text-lg-start" style="left: 0; bottom: 0; width: 100%; margin-top: 20px">
           <div class="container p-4">
             <div class="center">
               <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
