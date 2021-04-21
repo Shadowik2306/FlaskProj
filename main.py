@@ -42,7 +42,7 @@ def logout():
 @app.route('/')
 def start_page():
     db_sess = db_session.create_session()
-    products = db_sess.query(Products).all()
+    products = db_sess.query(Products).filter(Products.sold)
     params = {
         'title': "ВерстNET",
         'now_tab': 1,
@@ -64,11 +64,14 @@ def product_page(idProd):
                     lst=idProd
                 )
                 db_sess.add(bag)
-                db_sess.query(Products).get(idProd).sold = False
                 db_sess.commit()
             else:
                 user_bag[0].lst += f', {idProd}'
                 db_sess.commit()
+            db_sess = db_session.create_session()
+            prod = db_sess.query(Products).get(idProd)
+            prod.sold = 0
+            db_sess.commit()
             return redirect('/')
         else:
             return redirect('/login')
@@ -144,20 +147,32 @@ def comments():
     return render_template('comments.html', **params)
 
 
-@app.route('/bag')
+@app.route('/bag', methods=['GET', 'POST'])
 @login_required
 def bag():
+    if request.method == 'POST':
+        db_sess = db_session.create_session()
+        k = list(db_sess.query(Bag).filter(Bag.user_id == current_user.id))[0]
+        db_sess.delete(k)
+        db_sess.commit()
+        return redirect('/thanks')
     params = {
         'title': "ВерстNET",
         'now_tab': 6,
     }
     db_sess = db_session.create_session()
-    k = list(db_sess.query(Bag).filter(Bag.user_id == current_user.id))[0]
-    print(k)
-    dct = [(db_sess.query(Products).get(int(i)).name, db_sess.query(Products).get(int(i)).cost)
-           for i in set(k.lst.split(', '))]
-    print(dct)
-    return render_template('bag.html', lst=dct, **params)
+    k = list(db_sess.query(Bag).filter(Bag.user_id == current_user.id))
+    error = ''
+    dct = []
+    summa = 0
+    if k:
+        k = k[0]
+        dct = [(db_sess.query(Products).get(int(i)).name, db_sess.query(Products).get(int(i)).cost)
+               for i in set(k.lst.split(', '))]
+        summa = sum(i[1] for i in dct)
+    else:
+        error = 'В корзине пусто'
+    return render_template('bag.html', lst=dct, error=error, summa=summa, **params)
 
 
 @app.route('/write_comment', methods=['GET', 'POST'])
@@ -179,6 +194,12 @@ def write_comment():
     return render_template('write_comment.html', form=form, **params)
 
 
+@app.route('/thanks')
+@login_required
+def thanks():
+    return render_template('thanks.html')
+
+
 if __name__ == '__main__':
     api.add_resource(UsersListResource, '/api/users')
     api.add_resource(UserResource, '/api/users/<int:users_id>')
@@ -186,4 +207,4 @@ if __name__ == '__main__':
     api.add_resource(ProductResource, '/api/products/<int:products_id>')
     api.add_resource(CommentResource, '/api/comments/<int:comments_id>')
     api.add_resource(CommentListResource, '/api/comments')
-    app.run(port=8081, host='127.0.0.1')
+    app.run(port=8082, host='127.0.0.1')

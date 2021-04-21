@@ -2,10 +2,19 @@
 
 {% block content %}
     <div style="display: block; margin: 0 10%">
+    <form method="post">
     <h1>{{ current_user.surname }} {{ current_user.name }}</h1>
         <br>
+        <h4>{{ error }}</h4>
+        <div style="background-color: lightgrey">
         {% for i in lst %}
             <h3>{{ i[0] }}:  {{ i[1] }} руб. {{ i[2] }} шт. </h3>
         {% endfor %}
+        </div>
+        {% if lst %}
+        <h1>Итого: {{ summa }} руб.</h1>
+        <button type="submit" class="btn btn-primary right">Заказать</button>
+        {% endif %}
+    </form>
     </div>
 {% endblock %}
