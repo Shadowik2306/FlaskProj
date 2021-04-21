@@ -20,6 +20,7 @@ login_manager.init_app(app)
 db_session.global_init('db/blogs.db')
 api = Api(app)
 
+
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'})), 404
@@ -56,13 +57,14 @@ def product_page(idProd):
     if request.method == 'POST':
         if current_user.is_authenticated:
             db_sess = db_session.create_session()
-            user_bag = db_sess.query(Bag).where(Bag.user_id == current_user.id)
-            if not user_bag:
+            user_bag = db_sess.query(Bag).filter(Bag.user_id == current_user.id)
+            if not list(user_bag):
                 bag = Bag(
                     user_id=current_user.id,
                     lst=idProd
                 )
                 db_sess.add(bag)
+                db_sess.query(Products).get(idProd).sold = False
                 db_sess.commit()
             else:
                 user_bag[0].lst += f', {idProd}'
@@ -136,7 +138,7 @@ def comments():
     comm = db_sess.query(Comments).all()
     params = {
         'title': "ВерстNET",
-        'now_tab': 3,
+        'now_tab': 3 ,
         'comments': comm
     }
     return render_template('comments.html', **params)
@@ -150,8 +152,12 @@ def bag():
         'now_tab': 6,
     }
     db_sess = db_session.create_session()
-    k = db_sess.query(Bag).where(Bag.user_id == current_user.id)
-    return render_template('bag.html', lst=k, **params)
+    k = list(db_sess.query(Bag).filter(Bag.user_id == current_user.id))[0]
+    print(k)
+    dct = [(db_sess.query(Products).get(int(i)).name, db_sess.query(Products).get(int(i)).cost)
+           for i in set(k.lst.split(', '))]
+    print(dct)
+    return render_template('bag.html', lst=dct, **params)
 
 
 @app.route('/write_comment', methods=['GET', 'POST'])
@@ -180,4 +186,4 @@ if __name__ == '__main__':
     api.add_resource(ProductResource, '/api/products/<int:products_id>')
     api.add_resource(CommentResource, '/api/comments/<int:comments_id>')
     api.add_resource(CommentListResource, '/api/comments')
-    app.run(port=8081, host='127.0.0.2')
+    app.run(port=8081, host='127.0.0.1')

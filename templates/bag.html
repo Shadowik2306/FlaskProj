@@ -5,7 +5,7 @@
     <h1>{{ current_user.surname }} {{ current_user.name }}</h1>
         <br>
         {% for i in lst %}
-            <h3>{{ i.lst }}</h3>
+            <h3>{{ i[0] }}:  {{ i[1] }} руб. {{ i[2] }} шт. </h3>
         {% endfor %}
     </div>
 {% endblock %}

@@ -13,3 +13,4 @@ class Products(SqlAlchemyBase, SerializerMixin):
     image = sqlalchemy.Column(sqlalchemy.String)
     description = sqlalchemy.Column(sqlalchemy.String)
     cost = sqlalchemy.Column(sqlalchemy.Integer)
+    sold = sqlalchemy.Column(sqlalchemy.BOOLEAN)
