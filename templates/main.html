@@ -5,7 +5,7 @@
 <div class="row" style="margin: 0 10%">
      <div class="col-sm-4" style="display: inline-flex">
          {% for product in lst %}
-         {% if loop.index0 % 7 == 0 %}
+         {% if loop.index0 % 4 == 0 %}
             </div>
             </div>
             <div class="row" style="margin: 0 10%">
@@ -13,7 +13,7 @@
          {% endif %}
          <div class="product" style="margin-right: 20%;">
              <div class="product-img">
-                 <a href="product.id"><img style="width: 100px;" src="{{ product.image }}" alt=""></a>
+                 <a href="{{ product.id }}"><img style="width: 250px;" src="{{ product.image }}" alt=""></a>
              </div>
          <p class="product-title">
              <a href="{{ product.id }}">{{ product.name }}</a>

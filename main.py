@@ -1,13 +1,16 @@
-from flask import Flask, url_for, render_template, make_response, abort, redirect, request
+from flask import Flask, url_for, render_template, jsonify, make_response, abort, redirect, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data import db_session
 
-from data.products import Products
-from data.user import User
-from data.comments import Comments
+from data.bag import Bag
+from data.user_resource import *
+from data.products_resoursce import *
+from data.commentResource import *
 
 from forms.loginForm import LoginForm
 from forms.registrationForm import Register
+from forms.write_commForm import CommForm
+from forms.bagForm import BagForm
 
 
 app = Flask(__name__)
@@ -15,6 +18,11 @@ app.config['SECRET_KEY'] = 'my_project_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
 db_session.global_init('db/blogs.db')
+api = Api(app)
+
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(jsonify({'error': 'Not found'})), 404
 
 
 @login_manager.user_loader
@@ -47,7 +55,19 @@ def start_page():
 def product_page(idProd):
     if request.method == 'POST':
         if current_user.is_authenticated:
-            return 'Покупка совершена'
+            db_sess = db_session.create_session()
+            user_bag = db_sess.query(Bag).where(Bag.user_id == current_user.id)
+            if not user_bag:
+                bag = Bag(
+                    user_id=current_user.id,
+                    lst=idProd
+                )
+                db_sess.add(bag)
+                db_sess.commit()
+            else:
+                user_bag[0].lst += f', {idProd}'
+                db_sess.commit()
+            return redirect('/')
         else:
             return redirect('/login')
     db_sess = db_session.create_session()
@@ -108,8 +128,10 @@ def about_us():
     return render_template('about_us.html', **params)
 
 
-@app.route('/comments')
+@app.route('/comments', methods=['GET', 'POST'])
 def comments():
+    if request.method == 'POST':
+        return redirect('/write_comment')
     db_sess = db_session.create_session()
     comm = db_sess.query(Comments).all()
     params = {
@@ -120,5 +142,42 @@ def comments():
     return render_template('comments.html', **params)
 
 
+@app.route('/bag')
+@login_required
+def bag():
+    params = {
+        'title': "ВерстNET",
+        'now_tab': 6,
+    }
+    db_sess = db_session.create_session()
+    k = db_sess.query(Bag).where(Bag.user_id == current_user.id)
+    return render_template('bag.html', lst=k, **params)
+
+
+@app.route('/write_comment', methods=['GET', 'POST'])
+@login_required
+def write_comment():
+    form = CommForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        comments = Comments(
+            user_id=current_user.id,
+            text=form.text.data
+        )
+        db_sess.add(comments)
+        db_sess.commit()
+        return redirect('/comments')
+    params = {
+        'title': "ВерстNET",
+    }
+    return render_template('write_comment.html', form=form, **params)
+
+
 if __name__ == '__main__':
-    app.run(port=8080, host='127.0.0.1')
+    api.add_resource(UsersListResource, '/api/users')
+    api.add_resource(UserResource, '/api/users/<int:users_id>')
+    api.add_resource(ProductsListResource, '/api/products')
+    api.add_resource(ProductResource, '/api/products/<int:products_id>')
+    api.add_resource(CommentResource, '/api/comments/<int:comments_id>')
+    api.add_resource(CommentListResource, '/api/comments')
+    app.run(port=8081, host='127.0.0.2')

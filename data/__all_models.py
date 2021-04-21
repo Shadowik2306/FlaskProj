@@ -1,1 +1,1 @@
-from . import products, user
+from . import products, user, comments, bag

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div style="display: block; margin: 0 10%">
+    <h1>Напиши коммент)</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.text.label }}<br>
+            {{ form.text(type="") }}<br>
+            {% for error in form.text.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+        <div>{{ message }}</div>
+    </form>
+    </div>
+{% endblock %}
