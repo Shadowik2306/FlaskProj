@@ -153,6 +153,8 @@ def bag():
     if request.method == 'POST':
         db_sess = db_session.create_session()
         k = list(db_sess.query(Bag).filter(Bag.user_id == current_user.id))[0]
+        for i in k.lst.split(', '):
+            db_sess.query(Products).get(i).sold = 1
         db_sess.delete(k)
         db_sess.commit()
         return redirect('/thanks')
