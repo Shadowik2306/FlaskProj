@@ -1,28 +1,53 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div>
-<div class="row" style="margin: 0 10%">
-     <div class="col-sm-4" style="display: inline-flex">
-         {% for product in lst %}
-         {% if loop.index0 % 4 == 0 %}
-            </div>
-            </div>
-            <div class="row" style="margin: 0 10%">
-            <div class="col-sm-4" style="display: inline-flex;">
-         {% endif %}
-         <div class="product" style="margin-right: 20%;">
-             <div class="product-img">
-                 <a href="{{ product.id }}"><img style="width: 250px;" src="{{ product.image }}" alt=""></a>
+<div style="margin: 0 10%">
+    <h1 style="text-align: center;">Доступны для покупки</h1>
+    <div class="row">
+         <div class="col-sm-4" style="display: inline-flex">
+             {% for product in lst %}
+             {% if loop.index0 % 4 == 0 %}
+                </div>
+                </div>
+                <div class="row" style="margin: 0 10%">
+                <div class="col-sm-4" style="display: inline-flex;">
+             {% endif %}
+             <div class="product" style="margin-right: 20%;">
+                 <div class="product-img">
+                     <a href="{{ product.id }}"><img style="width: 250px; {% if product.sold == 0 %} color: gray; {% endif %}" src="{{ product.image }}" alt=""></a>
+                 </div>
+             <p class="product-title">
+                 <a href="{{ product.id }}">{{ product.name }}</a>
+             </p>
+             <p class="product-price">Price: {{ product.cost }} руб</p>
              </div>
-         <p class="product-title">
-             <a href="{{ product.id }}">{{ product.name }}</a>
-         </p>
-         <p class="product-price">Price: {{ product.cost }} руб</p>
+             {% endfor %}
          </div>
-         {% endfor %}
-     </div>
-</div>
+    </div>
+    {% if lst_of_sold %}
+        <h1 style="text-align: center;">В настоящее время недоступны</h1>
+        <div class="row">
+             <div class="col-sm-4" style="display: inline-flex">
+                 {% for product in lst_of_sold %}
+                 {% if loop.index0 % 4 == 0 %}
+                    </div>
+                    </div>
+                    <div class="row" style="margin: 0 10%">
+                    <div class="col-sm-4" style="display: inline-flex;">
+                 {% endif %}
+                 <div class="product" style="margin-right: 20%;">
+                     <div class="product-img">
+                         <a href="{{ product.id }}"><img style="width: 250px; {% if product.sold == 0 %} color: gray; {% endif %}" src="{{ product.image }}" alt=""></a>
+                     </div>
+                 <p class="product-title">
+                     <a href="{{ product.id }}">{{ product.name }}</a>
+                 </p>
+                 <p class="product-price">Price: {{ product.cost }} руб</p>
+                 </div>
+                 {% endfor %}
+             </div>
+        </div>
+    {% endif %}
 </div>
 
 {% endblock %}

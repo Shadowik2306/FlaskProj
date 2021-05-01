@@ -42,13 +42,15 @@ def logout():
 @app.route('/')
 def start_page():
     db_sess = db_session.create_session()
-    products = db_sess.query(Products).filter(Products.sold)
+    products_real = db_sess.query(Products).filter(Products.sold)
+    products_sold = db_sess.query(Products).filter(Products.sold == 0)
+    print(list(products_sold))
     params = {
         'title': "ВерстNET",
         'now_tab': 1,
-        'lst': products
+        'lst': products_real,
+        'lst_of_sold': products_sold if list(products_sold) else False
     }
-    print(list(params['lst']))
     return render_template('main.html', **params)
 
 
@@ -209,4 +211,4 @@ if __name__ == '__main__':
     api.add_resource(ProductResource, '/api/products/<int:products_id>')
     api.add_resource(CommentResource, '/api/comments/<int:comments_id>')
     api.add_resource(CommentListResource, '/api/comments')
-    app.run(port=8082, host='127.0.0.1')
+    app.run(port=8083, host='127.0.0.1')
