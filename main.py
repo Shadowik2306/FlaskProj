@@ -190,7 +190,7 @@ def bag():
         dct = [(db_sess.query(Products).get(int(i.split(': ')[0])).name, db_sess.query(Products).get(int(i.split(': ')[0])).cost, int(i.split(': ')[1]))
                for i in set(k.lst.split(', '))]
         print(dct)
-        summa = sum(i[1] for i in dct)
+        summa = sum(i[1] * i[2] for i in dct)
     else:
         error = 'В корзине пусто'
     return render_template('bag.html', lst=dct, error=error, summa=summa, **params)
