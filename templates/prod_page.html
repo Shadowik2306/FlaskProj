@@ -13,7 +13,12 @@
         </div>
     </div>
     <h4>{{ product.cost }}</h4>
+    {% if product.sold == 1 %}
+        <h3>На <input type="number" name="num" style="width:3%" min="1" value="3"> ч.</h3>
     <button type="submit" class="btn btn-primary" >Купить</button>
+    {% else %}
+        <h3>Товар не доступен</h3>
+    {% endif %}
      </form>
 </div>
 

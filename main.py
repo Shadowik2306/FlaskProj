@@ -1,6 +1,7 @@
 from flask import Flask, url_for, render_template, jsonify, make_response, abort, redirect, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data import db_session
+import datetime
 
 from data.bag import Bag
 from data.user_resource import *
@@ -39,16 +40,29 @@ def logout():
     return redirect("/")
 
 
+def get_time():
+    time = datetime.now().year * 31536000 + datetime.now().month * 2419200 + datetime.now().day * 86400 + datetime.now().hour * 3600 + datetime.now().minute * 60 + datetime.now().second
+    return time
+
+
 @app.route('/')
 def start_page():
     db_sess = db_session.create_session()
-    products_real = db_sess.query(Products).filter(Products.sold)
-    products_sold = db_sess.query(Products).filter(Products.sold == 0)
-    print(list(products_sold))
+    products_real = list(db_sess.query(Products).filter(Products.sold))
+    products_sold = list(db_sess.query(Products).filter(Products.sold == 0))
+    l = 0
+    for i in range(len(products_real)):
+        try:
+            if int(products_real[i - l].time) >= get_time():
+                products_sold.append(products_real[i - l])
+                del products_real[i - l]
+                l += 1
+        except Exception:
+            break
     params = {
         'title': "ВерстNET",
         'now_tab': 1,
-        'lst': products_real,
+        'lst': products_real if list(products_real) else False,
         'lst_of_sold': products_sold if list(products_sold) else False
     }
     return render_template('main.html', **params)
@@ -60,15 +74,16 @@ def product_page(idProd):
         if current_user.is_authenticated:
             db_sess = db_session.create_session()
             user_bag = db_sess.query(Bag).filter(Bag.user_id == current_user.id)
+            print(int(request.form['num']))
             if not list(user_bag):
                 bag = Bag(
                     user_id=current_user.id,
-                    lst=idProd
+                    lst=f'{idProd}: {request.form["num"]}'
                 )
                 db_sess.add(bag)
                 db_sess.commit()
             else:
-                user_bag[0].lst += f', {idProd}'
+                user_bag[0].lst += f', {idProd}: {request.form["num"]}'
                 db_sess.commit()
             db_sess = db_session.create_session()
             prod = db_sess.query(Products).get(idProd)
@@ -156,7 +171,8 @@ def bag():
         db_sess = db_session.create_session()
         k = list(db_sess.query(Bag).filter(Bag.user_id == current_user.id))[0]
         for i in k.lst.split(', '):
-            db_sess.query(Products).get(i).sold = 1
+            db_sess.query(Products).get(i.split(': ')[0]).sold = 1
+            db_sess.query(Products).get(i.split(': ')[0]).time = get_time() + int(i.split(': ')[1]) * 3600
         db_sess.delete(k)
         db_sess.commit()
         return redirect('/thanks')
@@ -171,8 +187,9 @@ def bag():
     summa = 0
     if k:
         k = k[0]
-        dct = [(db_sess.query(Products).get(int(i)).name, db_sess.query(Products).get(int(i)).cost)
+        dct = [(db_sess.query(Products).get(int(i.split(': ')[0])).name, db_sess.query(Products).get(int(i.split(': ')[0])).cost, int(i.split(': ')[1]))
                for i in set(k.lst.split(', '))]
+        print(dct)
         summa = sum(i[1] for i in dct)
     else:
         error = 'В корзине пусто'

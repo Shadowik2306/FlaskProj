@@ -5,16 +5,18 @@
     <form method="post">
     <h1>{{ current_user.surname }} {{ current_user.name }}</h1>
         <br>
-        <h4>{{ error }}</h4>
-        <div style="background-color: lightgrey">
-        {% for i in lst %}
-            <h3>{{ i[0] }}:  {{ i[1] }} руб. {{ i[2] }} шт. </h3>
-        {% endfor %}
+        <div style=" text-align: center;">
+            <div style="background-color: lightgrey; padding: 10px 0">
+                <h1>{{ error }}</h1>
+            {% for i in lst %}
+                <h3>{{ i[0] }}:  {{ i[1] }} руб. на {{ i[2] }} ч.</h3>
+            {% endfor %}
+            </div>
+            {% if lst %}
+            <h1>Итого: {{ summa }} руб.</h1>
+            <button type="submit" class="btn btn-primary right">Заказать</button>
+            {% endif %}
         </div>
-        {% if lst %}
-        <h1>Итого: {{ summa }} руб.</h1>
-        <button type="submit" class="btn btn-primary right">Заказать</button>
-        {% endif %}
     </form>
     </div>
 {% endblock %}

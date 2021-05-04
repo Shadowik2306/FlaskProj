@@ -2,6 +2,7 @@
 
 {% block content %}
 <div style="margin: 0 10%">
+    {% if lst %}
     <h1 style="text-align: center;">Доступны для покупки</h1>
     <div class="row">
          <div class="col-sm-4" style="display: inline-flex">
@@ -24,6 +25,7 @@
              {% endfor %}
          </div>
     </div>
+    {% endif %}
     {% if lst_of_sold %}
         <h1 style="text-align: center;">В настоящее время недоступны</h1>
         <div class="row">

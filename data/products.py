@@ -14,4 +14,5 @@ class Products(SqlAlchemyBase, SerializerMixin):
     description = sqlalchemy.Column(sqlalchemy.String)
     cost = sqlalchemy.Column(sqlalchemy.Integer)
     sold = sqlalchemy.Column(sqlalchemy.BOOLEAN)
-    time = sqlalchemy.Column(sqlalchemy.DATETIME)
+    time = sqlalchemy.Column(sqlalchemy.String)
+    busy = sqlalchemy.Column(sqlalchemy.Integer)
